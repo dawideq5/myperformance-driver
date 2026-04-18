@@ -2,6 +2,48 @@
 
 ## Signature Bridge (.NET 8 WPF)
 
+### Quick Install (One-Click)
+
+Run this single command in PowerShell to clone, build, and install:
+
+```powershell
+irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex
+```
+
+This will:
+- Clone the repository
+- Build the self-contained EXE
+- Create installer (if Inno Setup is installed)
+- Copy files to chosen location
+- Optionally start the application
+
+**Note:** Requires .NET 8 SDK for building. If you don't have it, download from: https://dotnet.microsoft.com/download/dotnet/8.0
+
+### Manual Install (Terminal Commands)
+
+If you prefer to run commands manually, copy and paste this block in PowerShell:
+
+```powershell
+# Clone repository
+git clone https://github.com/dawideq5/myperformance-driver.git
+cd myperformance-driver
+
+# Build self-contained EXE
+dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"
+
+# Copy to desired location (example: current directory)
+Copy-Item -Path "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse
+
+# Run application
+.\SignatureBridge\SignatureBridge.exe
+```
+
+Or as a single one-liner:
+
+```powershell
+git clone https://github.com/dawideq5/myperformance-driver.git; cd myperformance-driver; dotnet publish SignatureBridge/SignatureBridge.csproj -c Release -r win-x64 --self-contained true -o "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"; Copy-Item -Path "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse; .\SignatureBridge\SignatureBridge.exe
+```
+
 - Project: `SignatureBridge`
 - Local API:
   - `GET http://localhost:12345/show?url=https://...`
