@@ -1,6 +1,24 @@
 # One-click installer for Signature Bridge
 # This script clones, builds, and optionally installs Signature Bridge
 # Run: irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex
+# NOTE: This script MUST be run in PowerShell, not CMD!
+
+# Check if running in CMD (Command Prompt) instead of PowerShell
+if ($Host.Name -eq "Windows Command Processor" -or $Host.Name -eq "ConsoleHost" -and $env:PROMPT -ne $null -and $PSVersionTable.PSVersion.Major -lt 5) {
+    Write-Host "ERROR: You are running this script in CMD (Command Prompt)!" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "This script requires PowerShell." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "To run in PowerShell:" -ForegroundColor Green
+    Write-Host "  1. Press Win+X and select 'Windows PowerShell' or 'Terminal'" -ForegroundColor White
+    Write-Host "  2. Run this command:" -ForegroundColor White
+    Write-Host "     irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Alternative for CMD users:" -ForegroundColor Green
+    Write-Host "  1. Download install.cmd from the repository" -ForegroundColor White
+    Write-Host "  2. Run: install.cmd" -ForegroundColor White
+    exit 1
+}
 
 param(
     [string]$Branch = "main",

@@ -17,7 +17,13 @@ Signature Bridge is a Windows application that displays documents on a secondary
 
 ### Quick Install (One-Click)
 
-Run this single command in PowerShell to clone, build, and install:
+**IMPORTANT:** Use the correct terminal for your system:
+- **PowerShell** (Recommended): Blue window, commands start with `PS C:\>`
+- **CMD/Command Prompt**: Black window, commands start with `C:\>`
+
+#### Option 1: PowerShell (Recommended)
+
+Open **PowerShell** (right-click Start button → Windows PowerShell) and run:
 
 ```powershell
 irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex
@@ -30,11 +36,21 @@ This will:
 - Copy files to chosen location
 - Optionally start the application
 
+#### Option 2: CMD/Command Prompt
+
+Open **Command Prompt** (CMD) and run:
+
+```batch
+powershell -Command "irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex"
+```
+
 **Note:** Requires .NET 8 SDK for building. If you don't have it, download from: https://dotnet.microsoft.com/download/dotnet/8.0
 
-### Manual Install (Terminal Commands)
+### Manual Install
 
-If you prefer to run commands manually, copy and paste this block in PowerShell:
+#### PowerShell Commands (Recommended)
+
+Copy and paste this entire block into **PowerShell**:
 
 ```powershell
 # Clone repository
@@ -51,11 +67,28 @@ Copy-Item -Path "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" -
 .\SignatureBridge\SignatureBridge.exe
 ```
 
-Or as a single one-liner:
+**Single one-liner for PowerShell:**
 
 ```powershell
 git clone https://github.com/dawideq5/myperformance-driver.git; cd myperformance-driver; dotnet publish SignatureBridge/SignatureBridge.csproj -c Release -r win-x64 --self-contained true -o "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"; Copy-Item -Path "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse; .\SignatureBridge\SignatureBridge.exe
 ```
+
+#### CMD/Command Prompt Commands
+
+Copy and paste this entire block into **Command Prompt (CMD)**:
+
+```batch
+git clone https://github.com/dawideq5/myperformance-driver.git
+cd myperformance-driver
+dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"
+xcopy "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" "SignatureBridge\" /E /I /Y
+SignatureBridge\SignatureBridge.exe
+```
+
+**Important CMD notes:**
+- Do NOT copy lines starting with `#` - CMD doesn't support comments
+- Use `xcopy` instead of `Copy-Item`
+- Use backslashes `\` in paths, not forward slashes
 
 - Project: `SignatureBridge`
 - Local API:
@@ -149,3 +182,75 @@ iscc.exe installer/SignatureBridge.iss
 - Configured self-contained publish (no .NET runtime dependency)
 - Added compression for single-file output
 - Updated installer script for new build paths
+
+## Troubleshooting
+
+### "'irm' is not recognized as an internal or external command"
+
+**Problem:** You are trying to run a PowerShell command in CMD (Command Prompt).
+
+**Solution:** 
+1. Open PowerShell instead (right-click Start button → Windows PowerShell)
+2. Or use the CMD alternative command: `powershell -Command "irm ... | iex"`
+3. Or download and run `install.cmd` instead
+
+### "'Copy-Item' is not recognized..."
+
+**Problem:** You are using PowerShell commands in CMD.
+
+**Solution:**
+1. Open PowerShell for PowerShell commands
+2. Or use CMD equivalents (see "Manual Install" section above for CMD commands)
+
+### "'#' is not recognized..."
+
+**Problem:** CMD doesn't support `#` comments. You copy-pasted comment lines.
+
+**Solution:**
+1. In CMD: Don't copy lines starting with `#`
+2. In PowerShell: Comments work fine, but make sure you're actually in PowerShell
+
+### "git clone" fails with "already exists"
+
+**Problem:** Directory already exists from previous attempt.
+
+**Solution:**
+```powershell
+# Remove existing directory first
+Remove-Item -Recurse -Force myperformance-driver
+# Then run git clone again
+git clone https://github.com/dawideq5/myperformance-driver.git
+```
+
+Or use a different directory name:
+```powershell
+git clone https://github.com/dawideq5/myperformance-driver.git myperformance-driver-new
+```
+
+### Application doesn't start
+
+**Problem:** Missing dependencies or configuration issues.
+
+**Solution:**
+1. Check if .NET 8 SDK is installed: `dotnet --version`
+2. Verify config.json exists in the application directory
+3. Check Windows Event Viewer for errors
+4. Run from command line to see error messages: `.\SignatureBridge\SignatureBridge.exe`
+
+### No secondary monitor detected
+
+**Problem:** Application requires a secondary monitor (non-primary).
+
+**Solution:**
+1. Connect a second monitor
+2. Or use the Configuration window to select a different monitor
+3. Check Display Settings in Windows to ensure monitor is active
+
+## File Descriptions
+
+- `SignatureBridge.exe` - Main application
+- `config.json` - Configuration file (edit via GUI or manually)
+- `install.ps1` - PowerShell one-click installer
+- `install.cmd` - CMD/Batch installer alternative
+- `build.ps1` - Build script for developers
+- `installer/SignatureBridge.iss` - Inno Setup installer script

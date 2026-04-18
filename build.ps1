@@ -1,10 +1,17 @@
 # Build script for Signature Bridge
 # This script builds the self-contained EXE and creates the installer
+# NOTE: This script MUST be run in PowerShell, not CMD!
 
 param(
     [string]$Configuration = "Release",
     [switch]$SkipInstaller = $false
 )
+
+# Check if running in CMD
+if ($Host.Name -eq "Windows Command Processor") {
+    Write-Error "This script must be run in PowerShell, not CMD. Right-click Start button and select 'Windows PowerShell'"
+    exit 1
+}
 
 $ErrorActionPreference = "Stop"
 
