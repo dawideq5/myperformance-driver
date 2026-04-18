@@ -1,8 +1,10 @@
 # myperformance-driver
 
-## Signature Bridge (.NET 8 WPF)
+## Signature Bridge (.NET 10 WPF)
 
 Signature Bridge is a Windows application that displays documents on a secondary monitor for signature workflows. It provides a local HTTP API for remote control and includes a graphical configuration interface.
+
+**Requires .NET 10 SDK for building.**
 
 ### Features
 
@@ -15,36 +17,31 @@ Signature Bridge is a Windows application that displays documents on a secondary
 - **Tray Icon**: System tray integration with quick actions
 - **Self-Contained**: Single EXE with no runtime dependencies
 
-### Quick Install (One-Click)
+### Quick Install (Easiest - Works in ANY Terminal)
 
-**IMPORTANT:** Use the correct terminal for your system:
-- **PowerShell** (Recommended): Blue window, commands start with `PS C:\>`
-- **CMD/Command Prompt**: Black window, commands start with `C:\>`
+Download and run `start.bat` - it automatically switches to PowerShell and installs everything:
 
-#### Option 1: PowerShell (Recommended)
-
-Open **PowerShell** (right-click Start button → Windows PowerShell) and run:
-
-```powershell
-irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex
+```batch
+start.bat
 ```
 
-This will:
+This works in CMD, PowerShell, or any terminal. It will:
+- Automatically switch to PowerShell
 - Clone the repository
 - Build the self-contained EXE
 - Create installer (if Inno Setup is installed)
 - Copy files to chosen location
 - Optionally start the application
 
-#### Option 2: CMD/Command Prompt
+### Alternative: PowerShell One-Click
 
-Open **Command Prompt** (CMD) and run:
+If you prefer to use PowerShell directly:
 
-```batch
-powershell -Command "irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex"
+```powershell
+irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex
 ```
 
-**Note:** Requires .NET 8 SDK for building. If you don't have it, download from: https://dotnet.microsoft.com/download/dotnet/8.0
+**Note:** Requires .NET 10 SDK for building. If you don't have it, download from: https://dotnet.microsoft.com/download/dotnet/10.0
 
 ### Manual Install
 
@@ -58,10 +55,10 @@ git clone https://github.com/dawideq5/myperformance-driver.git
 cd myperformance-driver
 
 # Build self-contained EXE
-dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"
+dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish"
 
 # Copy to desired location (example: current directory)
-Copy-Item -Path "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse
+Copy-Item -Path "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse
 
 # Run application
 .\SignatureBridge\SignatureBridge.exe
@@ -70,7 +67,7 @@ Copy-Item -Path "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" -
 **Single one-liner for PowerShell:**
 
 ```powershell
-git clone https://github.com/dawideq5/myperformance-driver.git; cd myperformance-driver; dotnet publish SignatureBridge/SignatureBridge.csproj -c Release -r win-x64 --self-contained true -o "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"; Copy-Item -Path "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse; .\SignatureBridge\SignatureBridge.exe
+git clone https://github.com/dawideq5/myperformance-driver.git; cd myperformance-driver; dotnet publish SignatureBridge/SignatureBridge.csproj -c Release -r win-x64 --self-contained true -o "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish"; Copy-Item -Path "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse; .\SignatureBridge\SignatureBridge.exe
 ```
 
 #### CMD/Command Prompt Commands
@@ -80,8 +77,8 @@ Copy and paste this entire block into **Command Prompt (CMD)**:
 ```batch
 git clone https://github.com/dawideq5/myperformance-driver.git
 cd myperformance-driver
-dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"
-xcopy "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\*" "SignatureBridge\" /E /I /Y
+dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish"
+xcopy "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\*" "SignatureBridge\" /E /I /Y
 SignatureBridge\SignatureBridge.exe
 ```
 

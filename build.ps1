@@ -19,11 +19,11 @@ Write-Host "Building Signature Bridge..." -ForegroundColor Green
 
 # Build the project
 Write-Host "Building project..." -ForegroundColor Cyan
-dotnet publish SignatureBridge/SignatureBridge.csproj `
-    --configuration $Configuration `
-    --runtime win-x64 `
-    --self-contained true `
-    --output "SignatureBridge/bin/$Configuration/net8.0-windows/win-x64/publish"
+dotnet publish SignatureBridge/SignatureBridge.csproj \
+    --configuration $Configuration \
+    --runtime win-x64 \
+    --self-contained true \
+    --output "SignatureBridge/bin/$Configuration/net10.0-windows/win-x64/publish"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build failed!" -ForegroundColor Red
@@ -50,4 +50,4 @@ if (-not $SkipInstaller) {
 }
 
 Write-Host "`nBuild complete!" -ForegroundColor Green
-Write-Host "Output: SignatureBridge/bin/$Configuration/net8.0-windows/win-x64/publish/" -ForegroundColor Cyan
+Write-Host "Output: SignatureBridge/bin/$Configuration/net10.0-windows/win-x64/publish/" -ForegroundColor Cyan

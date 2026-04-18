@@ -24,8 +24,8 @@ WizardImageFile=installer\wizard-image.bmp
 WizardSmallImageFile=installer\wizard-small.bmp
 
 [Files]
-Source: "..\SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\config.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\config.json"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
@@ -78,22 +78,22 @@ begin
   Result := 0;
 end;
 
-function IsDotNet8Installed: Boolean;
+function IsDotNet10Installed: Boolean;
 var
   Version: string;
 begin
   Result := False;
   if RegQueryStringValue(HKLM64, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost', 'Version', Version) then
   begin
-    Result := CompareDotNetVersion(Version, '8.0.0') >= 0;
+    Result := CompareDotNetVersion(Version, '10.0.0') >= 0;
   end;
 end;
 
 function InitializeSetup(): Boolean;
 begin
-  if not IsDotNet8Installed() then
+  if not IsDotNet10Installed() then
   begin
-    MsgBox('.NET 8 Desktop Runtime is required. Install it first, then rerun setup.', mbCriticalError, MB_OK);
+    MsgBox('.NET 10 Desktop Runtime is required. Install it first, then rerun setup.', mbCriticalError, MB_OK);
     Result := False;
   end
   else

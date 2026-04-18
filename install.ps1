@@ -57,7 +57,7 @@ try {
         --configuration Release `
         --runtime win-x64 `
         --self-contained true `
-        --output "SignatureBridge/bin/Release/net8.0-windows/win-x64/publish" `
+        --output "SignatureBridge/bin/Release/net10.0-windows/win-x64/publish" `
         /p:PublishSingleFile=true `
         /p:IncludeNativeLibrariesForSelfExtract=true `
         /p:EnableCompressionInSingleFile=true
@@ -67,7 +67,7 @@ try {
     }
     Pop-Location
 
-    $publishDir = Join-Path $tempDir "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish"
+    $publishDir = Join-Path $tempDir "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish"
     $exePath = Join-Path $publishDir "SignatureBridge.exe"
 
     if (-not (Test-Path $exePath)) {

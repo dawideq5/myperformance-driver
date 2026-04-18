@@ -12,7 +12,7 @@ dotnet publish SignatureBridge/SignatureBridge.csproj \
     --configuration "$CONFIGURATION" \
     --runtime win-x64 \
     --self-contained true \
-    --output "SignatureBridge/bin/$CONFIGURATION/net8.0-windows/win-x64/publish"
+    --output "SignatureBridge/bin/$CONFIGURATION/net10.0-windows/win-x64/publish"
 
 echo "Build successful!"
 echo "Note: To create the installer, run build.ps1 on Windows with Inno Setup installed."

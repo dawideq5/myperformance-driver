@@ -44,13 +44,13 @@ REM Build project
 echo.
 echo Building project...
 cd /d "%tempDir%"
-dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net8.0-windows\win-x64\publish" /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:EnableCompressionInSingleFile=true
+dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish" /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:EnableCompressionInSingleFile=true
 if errorlevel 1 (
     echo Error: Build failed
     exit /b 1
 )
 
-set publishDir=%tempDir%\SignatureBridge\bin\Release\net8.0-windows\win-x64\publish
+set publishDir=%tempDir%\SignatureBridge\bin\Release\net10.0-windows\win-x64\publish
 set exePath=%publishDir%\SignatureBridge.exe
 
 if not exist "%exePath%" (
