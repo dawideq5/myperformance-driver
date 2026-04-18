@@ -10,13 +10,15 @@
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="True"
-        WindowState="Normal">
+        WindowState="Normal"
+        Background="#000000"
+        RenderOptions.BitmapScalingMode="HighQuality">
     <Grid>
         <Grid x:Name="IdleView">
-            <Image x:Name="LogoImage" Stretch="Uniform" />
+            <Image x:Name="LogoImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
         </Grid>
         <Grid x:Name="SigningView" Visibility="Collapsed">
-            <wv2:WebView2 x:Name="SigningBrowser" />
+            <wv2:WebView2 x:Name="SigningBrowser" DefaultBackgroundColor="#000000" />
         </Grid>
     </Grid>
 </Window>

@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Microsoft.Web.WebView2.Core;
 using Screen = System.Windows.Forms.Screen;
+using System.Net.Http;
 
 namespace SignatureBridge;
 
@@ -17,14 +18,18 @@ public partial class MainWindow : Window
     private readonly BridgeConfig _config;
     private readonly System.Windows.Forms.NotifyIcon _notifyIcon;
     private readonly CancellationTokenSource _listenerCancellation = new();
+    private readonly CancellationTokenSource _appCancellation = new();
+    private readonly HttpClient _httpClient;
     private bool _allowClose;
     private bool _connected;
     private Screen? _activeScreen;
+    private BitmapImage? _cachedLogo;
 
     public MainWindow()
     {
         InitializeComponent();
         _config = BridgeConfig.Load(Path.Combine(AppContext.BaseDirectory, "config.json"));
+        _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
         SetLogoImage();
         _notifyIcon = CreateTrayIcon();
 
@@ -51,19 +56,31 @@ public partial class MainWindow : Window
             }
         });
 
+        var requestTasks = new List<Task>();
         while (!cancellationToken.IsCancellationRequested)
         {
             HttpListenerContext? context = null;
             try
             {
-                context = await listener.GetContextAsync();
-                await ProcessRequestAsync(context);
+                context = await listener.GetContextAsync(cancellationToken);
+                var processTask = ProcessRequestAsync(context);
+                requestTasks.Add(processTask);
+                
+                if (requestTasks.Count >= 10)
+                {
+                    var completed = await Task.WhenAny(requestTasks);
+                    requestTasks.Remove(completed);
+                }
             }
             catch (HttpListenerException) when (cancellationToken.IsCancellationRequested)
             {
                 break;
             }
             catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 break;
             }
@@ -77,22 +94,29 @@ public partial class MainWindow : Window
             }
         }
 
+        if (requestTasks.Count > 0)
+        {
+            await Task.WhenAll(requestTasks);
+        }
+
         listener.Stop();
     }
 
     private async Task ProcessRequestAsync(HttpListenerContext context)
     {
-        if (!context.Request.IsLocal)
+        try
         {
-            await WriteResponseAsync(context.Response, 403, "Forbidden", "text/plain");
-            return;
-        }
+            if (!context.Request.IsLocal)
+            {
+                await WriteResponseAsync(context.Response, 403, "Forbidden", "text/plain");
+                return;
+            }
 
-        if (!IsTokenAuthorized(context.Request))
-        {
-            await WriteResponseAsync(context.Response, 401, "Unauthorized", "text/plain");
-            return;
-        }
+            if (!IsTokenAuthorized(context.Request))
+            {
+                await WriteResponseAsync(context.Response, 401, "Unauthorized", "text/plain");
+                return;
+            }
 
         var route = context.Request.Url?.AbsolutePath?.Trim('/').ToLowerInvariant();
         switch (route)
@@ -131,6 +155,19 @@ public partial class MainWindow : Window
                 await WriteResponseAsync(context.Response, 404, "Not Found", "text/plain");
                 return;
         }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Request processing error: {ex}");
+            try
+            {
+                await WriteResponseAsync(context.Response, 500, "Internal Server Error", "text/plain");
+            }
+            catch
+            {
+                // Response already sent or closed
+            }
+        }
     }
 
     private static async Task WriteResponseAsync(HttpListenerResponse response, int statusCode, string content, string contentType)
@@ -150,28 +187,45 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (SigningBrowser.CoreWebView2 is null)
+        try
         {
-            await SigningBrowser.EnsureCoreWebView2Async();
-            var core = SigningBrowser.CoreWebView2;
-            if (core is null)
+            if (SigningBrowser.CoreWebView2 is null)
             {
-                return;
+                try
+                {
+                    await SigningBrowser.EnsureCoreWebView2Async(null);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"WebView2 initialization failed: {ex.Message}");
+                    return;
+                }
+                
+                var core = SigningBrowser.CoreWebView2;
+                if (core is null)
+                {
+                    Debug.WriteLine("WebView2 core is null after initialization");
+                    return;
+                }
+
+                core.Settings.AreDefaultContextMenusEnabled = false;
+                core.Settings.AreDevToolsEnabled = false;
+                core.NewWindowRequested += (_, args) =>
+                {
+                    args.Handled = true;
+                    SigningBrowser.Source = args.Uri is null ? null : new Uri(args.Uri);
+                };
             }
 
-            core.Settings.AreDefaultContextMenusEnabled = false;
-            core.Settings.AreDevToolsEnabled = false;
-            core.NewWindowRequested += (_, args) =>
-            {
-                args.Handled = true;
-                SigningBrowser.Source = args.Uri is null ? null : new Uri(args.Uri);
-            };
+            SigningBrowser.Source = new Uri(url);
+            IdleView.Visibility = Visibility.Collapsed;
+            SigningView.Visibility = Visibility.Visible;
+            ShowAndFocus();
         }
-
-        SigningBrowser.Source = new Uri(url);
-        IdleView.Visibility = Visibility.Collapsed;
-        SigningView.Visibility = Visibility.Visible;
-        ShowAndFocus();
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error showing signing view: {ex.Message}");
+        }
     }
 
     private void ShowIdle()
@@ -181,7 +235,7 @@ public partial class MainWindow : Window
         ShowAndFocus();
     }
 
-    private void SetLogoImage()
+    private async void SetLogoImage()
     {
         if (string.IsNullOrWhiteSpace(_config.LogoUri))
         {
@@ -190,11 +244,19 @@ public partial class MainWindow : Window
 
         try
         {
+            if (_cachedLogo is not null)
+            {
+                LogoImage.Source = _cachedLogo;
+                return;
+            }
+
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.UriSource = new Uri(_config.LogoUri, UriKind.Absolute);
             bitmap.EndInit();
+            bitmap.Freeze();
+            _cachedLogo = bitmap;
             LogoImage.Source = bitmap;
         }
         catch (Exception ex)
@@ -348,10 +410,13 @@ public partial class MainWindow : Window
             return;
         }
 
+        _appCancellation.Cancel();
         _listenerCancellation.Cancel();
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
+        _httpClient.Dispose();
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
+        _cachedLogo = null;
         base.OnClosing(e);
     }
 }

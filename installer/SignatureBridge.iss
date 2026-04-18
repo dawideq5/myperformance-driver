@@ -15,10 +15,8 @@ SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: "..\SignatureBridge\bin\Release\net8.0-windows\publish\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\SignatureBridge\bin\Release\net8.0-windows\publish\config.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\SignatureBridge\bin\Release\net8.0-windows\publish\Microsoft.Web.WebView2.Core.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "..\SignatureBridge\bin\Release\net8.0-windows\publish\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "..\SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\config.json"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
