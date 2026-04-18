@@ -4,7 +4,7 @@
 
 Signature Bridge is a Windows application that displays documents on a secondary monitor for signature workflows. It provides a local HTTP API for remote control and includes a graphical configuration interface.
 
-**Requires .NET 10 SDK for building.**
+**Self-contained installer - no dependencies required.**
 
 ### Features
 
@@ -17,75 +17,32 @@ Signature Bridge is a Windows application that displays documents on a secondary
 - **Tray Icon**: System tray integration with quick actions
 - **Self-Contained**: Single EXE with no runtime dependencies
 
-### Quick Install (Easiest - Works in ANY Terminal)
+## Installation
 
-Download and run `start.bat` - it automatically switches to PowerShell and installs everything:
+### Download and Run Installer (Recommended)
 
-```batch
-start.bat
-```
+Download the installer from the [Releases](https://github.com/dawideq5/myperformance-driver/releases) page and run it:
 
-This works in CMD, PowerShell, or any terminal. It will:
-- Automatically switch to PowerShell
-- Clone the repository
-- Build the self-contained EXE
-- Create installer (if Inno Setup is installed)
-- Copy files to chosen location
-- Optionally start the application
+1. Download `SignatureBridge-Setup.exe`
+2. Double-click to run
+3. Follow the installation wizard
+4. Launch the application from Start Menu or desktop shortcut
 
-### Alternative: PowerShell One-Click
+The installer includes everything needed - no additional downloads required.
 
-If you prefer to use PowerShell directly:
+**Note:** Installers are automatically built and released on GitHub when you push a version tag (see "Creating Release" below).
 
-```powershell
-irm https://raw.githubusercontent.com/dawideq5/myperformance-driver/main/install.ps1 | iex
-```
+### Manual Install (For Developers)
 
-**Note:** Requires .NET 10 SDK for building. If you don't have it, download from: https://dotnet.microsoft.com/download/dotnet/10.0
-
-### Manual Install
-
-#### PowerShell Commands (Recommended)
-
-Copy and paste this entire block into **PowerShell**:
+**Note:** This requires .NET 10 SDK and is intended for developers building from source.
 
 ```powershell
-# Clone repository
 git clone https://github.com/dawideq5/myperformance-driver.git
 cd myperformance-driver
-
-# Build self-contained EXE
-dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish"
-
-# Copy to desired location (example: current directory)
-Copy-Item -Path "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse
-
-# Run application
-.\SignatureBridge\SignatureBridge.exe
+dotnet publish SignatureBridge/SignatureBridge.csproj -c Release -r win-x64 --self-contained true
 ```
 
-**Single one-liner for PowerShell:**
-
-```powershell
-git clone https://github.com/dawideq5/myperformance-driver.git; cd myperformance-driver; dotnet publish SignatureBridge/SignatureBridge.csproj -c Release -r win-x64 --self-contained true -o "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish"; Copy-Item -Path "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\*" -Destination ".\SignatureBridge" -Recurse; .\SignatureBridge\SignatureBridge.exe
-```
-
-#### CMD/Command Prompt Commands
-
-Copy and paste this entire block into **Command Prompt (CMD)**:
-
-```batch
-git clone https://github.com/dawideq5/myperformance-driver.git
-cd myperformance-driver
-dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish"
-xcopy "SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\*" "SignatureBridge\" /E /I /Y
-SignatureBridge\SignatureBridge.exe
-```
-
-**Important CMD notes:**
-- Do NOT copy lines starting with `#` - CMD doesn't support comments
-- Use `xcopy` instead of `Copy-Item`
-- Use backslashes `\` in paths, not forward slashes
+Then run from the publish directory.
 
 - Project: `SignatureBridge`
 - Local API:
@@ -124,34 +81,63 @@ The configuration window allows you to:
 5. Use the "Test" button to verify document display
 6. Control the application via HTTP API from your web application
 
-## Building
+## Creating Release (For Developers)
 
-### Windows (recommended)
+The project uses GitHub Actions to automatically build and release installers.
+
+### Automatic Release with GitHub Actions
+
+To create a new release:
+
+1. Commit and push your changes:
+```bash
+git add .
+git commit -m "Your changes"
+git push
+```
+
+2. Create and push a version tag:
+```bash
+git tag v1.2.0
+git push origin v1.2.0
+```
+
+3. GitHub Actions will automatically:
+   - Build the project
+   - Create the installer
+   - Create a GitHub Release
+   - Upload `SignatureBridge-Setup.exe` to the release
+
+The installer will be available at: https://github.com/dawideq5/myperformance-driver/releases
+
+### Manual Build (If GitHub Actions Fails)
+
+If the installer is not available in Releases, you can build it yourself:
+
+### Prerequisites
+- .NET 10 SDK
+- Inno Setup (https://jrsoftware.org/isdl.php)
+- Windows x64
+
+### Build Instructions
+
+1. Clone the repository:
+```powershell
+git clone https://github.com/dawideq5/myperformance-driver.git
+cd myperformance-driver
+```
+
+2. Build the installer:
 ```powershell
 .\build.ps1
 ```
 
-### Cross-platform
-```bash
-./build.sh
-```
+This will:
+- Build the self-contained EXE
+- Create the installer (SignatureBridge-Setup.exe)
+- Output both files in the project root
 
-To build without creating the installer:
-```powershell
-.\build.ps1 -SkipInstaller
-```
-
-### Manual build
-```bash
-dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true
-```
-
-The output EXE will be in `SignatureBridge/bin/Release/net8.0-windows/win-x64/publish/`.
-
-To create the installer, run Inno Setup:
-```bash
-iscc.exe installer/SignatureBridge.iss
-```
+The installer will be created as `SignatureBridge-Setup.exe` in the project directory.
 
 ## Optimizations Applied
 
@@ -182,57 +168,14 @@ iscc.exe installer/SignatureBridge.iss
 
 ## Troubleshooting
 
-### "'irm' is not recognized as an internal or external command"
-
-**Problem:** You are trying to run a PowerShell command in CMD (Command Prompt).
-
-**Solution:** 
-1. Open PowerShell instead (right-click Start button → Windows PowerShell)
-2. Or use the CMD alternative command: `powershell -Command "irm ... | iex"`
-3. Or download and run `install.cmd` instead
-
-### "'Copy-Item' is not recognized..."
-
-**Problem:** You are using PowerShell commands in CMD.
-
-**Solution:**
-1. Open PowerShell for PowerShell commands
-2. Or use CMD equivalents (see "Manual Install" section above for CMD commands)
-
-### "'#' is not recognized..."
-
-**Problem:** CMD doesn't support `#` comments. You copy-pasted comment lines.
-
-**Solution:**
-1. In CMD: Don't copy lines starting with `#`
-2. In PowerShell: Comments work fine, but make sure you're actually in PowerShell
-
-### "git clone" fails with "already exists"
-
-**Problem:** Directory already exists from previous attempt.
-
-**Solution:**
-```powershell
-# Remove existing directory first
-Remove-Item -Recurse -Force myperformance-driver
-# Then run git clone again
-git clone https://github.com/dawideq5/myperformance-driver.git
-```
-
-Or use a different directory name:
-```powershell
-git clone https://github.com/dawideq5/myperformance-driver.git myperformance-driver-new
-```
-
 ### Application doesn't start
 
-**Problem:** Missing dependencies or configuration issues.
+**Problem:** Application fails to launch.
 
 **Solution:**
-1. Check if .NET 8 SDK is installed: `dotnet --version`
-2. Verify config.json exists in the application directory
-3. Check Windows Event Viewer for errors
-4. Run from command line to see error messages: `.\SignatureBridge\SignatureBridge.exe`
+1. Verify Windows is x64 (installer is 64-bit only)
+2. Check Windows Event Viewer for error details
+3. Reinstall the application
 
 ### No secondary monitor detected
 
@@ -246,8 +189,5 @@ git clone https://github.com/dawideq5/myperformance-driver.git myperformance-dri
 ## File Descriptions
 
 - `SignatureBridge.exe` - Main application
-- `config.json` - Configuration file (edit via GUI or manually)
-- `install.ps1` - PowerShell one-click installer
-- `install.cmd` - CMD/Batch installer alternative
-- `build.ps1` - Build script for developers
+- `config.json` - Configuration file (edit via GUI)
 - `installer/SignatureBridge.iss` - Inno Setup installer script

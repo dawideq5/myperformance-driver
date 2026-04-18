@@ -1,0 +1,83 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a GitHub release'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore SignatureBridge/SignatureBridge.csproj
+      
+    - name: Build project
+      run: dotnet publish SignatureBridge/SignatureBridge.csproj --configuration Release --runtime win-x64 --self-contained true --output SignatureBridge/bin/Release/net10.0-windows/win-x64/publish
+      
+    - name: Setup Inno Setup
+      run: |
+        choco install innosetup -y
+        echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        
+    - name: Create installer
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer/SignatureBridge.iss
+      shell: pwsh
+      
+    - name: Verify installer exists
+      run: |
+        if (Test-Path "SignatureBridge-Setup.exe") {
+          Write-Host "Installer created successfully"
+          Get-Item SignatureBridge-Setup.exe | Select-Object Name, Length
+        } else {
+          Write-Error "Installer not found!"
+          exit 1
+        }
+      shell: pwsh
+      
+    - name: Upload installer as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SignatureBridge-Setup
+        path: SignatureBridge-Setup.exe
+        retention-days: 30
+      
+    - name: Get version
+      id: get_version
+      run: |
+        if ($env:GITHUB_REF -like 'refs/tags/*') {
+          $version = $env:GITHUB_REF -replace 'refs/tags/v', ''
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+        } else {
+          $version = "1.2.0"
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+        }
+      shell: pwsh
+      
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: SignatureBridge-Setup.exe
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

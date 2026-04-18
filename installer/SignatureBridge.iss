@@ -1,5 +1,5 @@
 #define AppName "Signature Bridge"
-#define AppVersion "1.1.0"
+#define AppVersion "1.2.0"
 #define AppExeName "SignatureBridge.exe"
 #define AppPublisher "MyPerformance"
 #define AppURL "https://github.com/dawideq5/myperformance-driver"
@@ -15,13 +15,17 @@ AppUpdatesURL={#AppURL}
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 OutputDir=.
-OutputBaseFilename=SignatureBridgeInstaller
-Compression=lzma
+OutputBaseFilename=SignatureBridge-Setup
+Compression=lzma2/ultra
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
+ArchitecturesAllowed=x64
 WizardStyle=Modern
 WizardImageFile=installer\wizard-image.bmp
 WizardSmallImageFile=installer\wizard-small.bmp
+UninstallDisplayIcon={app}\{#AppExeName}
+DisableDirPage=no
+DisableProgramGroupPage=yes
 
 [Files]
 Source: "..\SignatureBridge\bin\Release\net10.0-windows\win-x64\publish\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -35,69 +39,3 @@ Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "{#AppName}"; ValueData: """{app}\{#AppExeName}"""; Flags: uninsdeletevalue
-
-[Code]
-function CompareDotNetVersion(const Left, Right: string): Integer;
-var
-  LParts, RParts: TArrayOfString;
-  I, LValue, RValue, Count: Integer;
-begin
-  LParts := SplitString(Left, '.');
-  RParts := SplitString(Right, '.');
-
-  if GetArrayLength(LParts) > GetArrayLength(RParts) then
-    Count := GetArrayLength(LParts)
-  else
-    Count := GetArrayLength(RParts);
-
-  for I := 0 to Count - 1 do
-  begin
-    if I < GetArrayLength(LParts) then
-      LValue := StrToIntDef(LParts[I], 0)
-    else
-      LValue := 0;
-
-    if I < GetArrayLength(RParts) then
-      RValue := StrToIntDef(RParts[I], 0)
-    else
-      RValue := 0;
-
-    if LValue > RValue then
-    begin
-      Result := 1;
-      exit;
-    end;
-
-    if LValue < RValue then
-    begin
-      Result := -1;
-      exit;
-    end;
-  end;
-
-  Result := 0;
-end;
-
-function IsDotNet10Installed: Boolean;
-var
-  Version: string;
-begin
-  Result := False;
-  if RegQueryStringValue(HKLM64, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost', 'Version', Version) then
-  begin
-    Result := CompareDotNetVersion(Version, '10.0.0') >= 0;
-  end;
-end;
-
-function InitializeSetup(): Boolean;
-begin
-  if not IsDotNet10Installed() then
-  begin
-    MsgBox('.NET 10 Desktop Runtime is required. Install it first, then rerun setup.', mbCriticalError, MB_OK);
-    Result := False;
-  end
-  else
-  begin
-    Result := True;
-  end;
-end;
