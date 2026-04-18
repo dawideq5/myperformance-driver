@@ -15,7 +15,7 @@ namespace SignatureBridge;
 
 public partial class MainWindow : Window
 {
-    private readonly BridgeConfig _config;
+    private BridgeConfig _config;
     private readonly System.Windows.Forms.NotifyIcon _notifyIcon;
     private readonly CancellationTokenSource _listenerCancellation = new();
     private readonly CancellationTokenSource _appCancellation = new();
@@ -24,17 +24,39 @@ public partial class MainWindow : Window
     private bool _connected;
     private Screen? _activeScreen;
     private BitmapImage? _cachedLogo;
+    private readonly string _configFilePath;
 
     public MainWindow()
     {
         InitializeComponent();
-        _config = BridgeConfig.Load(Path.Combine(AppContext.BaseDirectory, "config.json"));
+        _configFilePath = Path.Combine(AppContext.BaseDirectory, "config.json");
+        _config = BridgeConfig.Load(_configFilePath);
         _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
         SetLogoImage();
         _notifyIcon = CreateTrayIcon();
 
         Loaded += OnLoaded;
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+    }
+
+    public void ReloadConfig()
+    {
+        _config = BridgeConfig.Load(_configFilePath);
+        _cachedLogo = null;
+        SetLogoImage();
+        ApplyDisplayConfiguration();
+    }
+
+    public void OpenConfigWindow()
+    {
+        var configWindow = new ConfigWindow(this, _config, _configFilePath);
+        configWindow.Owner = this;
+        configWindow.ShowDialog();
+    }
+
+    private void OnConfigButtonClick(object sender, RoutedEventArgs e)
+    {
+        OpenConfigWindow();
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -359,6 +381,8 @@ public partial class MainWindow : Window
             }
         });
         contextMenu.Items.Add("Idle", null, (_, _) => Dispatcher.Invoke(ShowIdle));
+        contextMenu.Items.Add("Configuration", null, (_, _) => Dispatcher.Invoke(OpenConfigWindow));
+        contextMenu.Items.Add("-");
         contextMenu.Items.Add("Exit", null, (_, _) =>
         {
             _allowClose = true;

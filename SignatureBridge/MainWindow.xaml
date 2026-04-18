@@ -16,6 +16,26 @@
     <Grid>
         <Grid x:Name="IdleView">
             <Image x:Name="LogoImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+            <Button x:Name="ConfigButton"
+                    Content="⚙"
+                    Width="40"
+                    Height="40"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="10"
+                    FontSize="20"
+                    Background="#3b82f6"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="OnConfigButtonClick"
+                    ToolTip="Open Configuration">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="20"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
         </Grid>
         <Grid x:Name="SigningView" Visibility="Collapsed">
             <wv2:WebView2 x:Name="SigningBrowser" DefaultBackgroundColor="#000000" />

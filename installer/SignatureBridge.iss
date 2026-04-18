@@ -1,11 +1,17 @@
 #define AppName "Signature Bridge"
-#define AppVersion "1.0.0"
+#define AppVersion "1.1.0"
 #define AppExeName "SignatureBridge.exe"
+#define AppPublisher "MyPerformance"
+#define AppURL "https://github.com/dawideq5/myperformance-driver"
 
 [Setup]
 AppId={{A8E488DB-0AA2-4B0D-9AD8-A95D9B73D356}
 AppName={#AppName}
 AppVersion={#AppVersion}
+AppPublisher={#AppPublisher}
+AppPublisherURL={#AppURL}
+AppSupportURL={#AppURL}
+AppUpdatesURL={#AppURL}
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 OutputDir=.
@@ -13,6 +19,9 @@ OutputBaseFilename=SignatureBridgeInstaller
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
+WizardStyle=Modern
+WizardImageFile=installer\wizard-image.bmp
+WizardSmallImageFile=installer\wizard-small.bmp
 
 [Files]
 Source: "..\SignatureBridge\bin\Release\net8.0-windows\win-x64\publish\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion

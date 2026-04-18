@@ -1,0 +1,179 @@
+<Window x:Class="SignatureBridge.ConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Signature Bridge - Configuration" 
+        Height="500" 
+        Width="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        Background="#1e1e1e">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#3b82f6"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="4"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#2d2d2d"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="#aaa"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+    </Window.Resources>
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+            <TextBlock Text="Signature Bridge Configuration" 
+                       FontSize="20" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,20"/>
+            
+            <!-- Logo Image Section -->
+            <GroupBox Header="Loading Image" 
+                      Margin="0,0,0,15" 
+                      Foreground="#aaa">
+                <StackPanel Margin="10">
+                    <Label Content="Logo/Loading Image URL:"/>
+                    <Grid Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="LogoUriTextBox" 
+                                 Grid.Column="0"
+                                 Text="https://dummyimage.com/1920x1080/0e0e0e/ffffff.png&text=Signature+Bridge"/>
+                        <Button Grid.Column="1" 
+                                Content="Browse..." 
+                                Width="80"
+                                Margin="5,0,0,0"
+                                Click="OnBrowseLogoClick"/>
+                    </Grid>
+                    <TextBlock x:Name="LogoPreviewText" 
+                               Text="Preview will appear here" 
+                               FontSize="12" 
+                               Foreground="#888"
+                               Margin="0,5"/>
+                    <Border x:Name="LogoPreviewBorder"
+                            BorderBrush="#444" 
+                            BorderThickness="1" 
+                            Height="100" 
+                            Margin="0,5"
+                            Background="#2d2d2d">
+                        <Image x:Name="LogoPreviewImage" 
+                               Stretch="Uniform" 
+                               Margin="5"/>
+                    </Border>
+                </StackPanel>
+            </GroupBox>
+            
+            <!-- Monitor Selection -->
+            <GroupBox Header="Display Settings" 
+                      Margin="0,0,0,15" 
+                      Foreground="#aaa">
+                <StackPanel Margin="10">
+                    <Label Content="Preferred Monitor:"/>
+                    <ComboBox x:Name="MonitorComboBox" 
+                              Margin="0,5" 
+                              Background="#2d2d2d" 
+                              Foreground="#ffffff"/>
+                    
+                    <Label Content="Preferred Resolution (e.g., 1920x1080):" Margin="0,10,0,0"/>
+                    <TextBox x:Name="ResolutionTextBox" 
+                             Margin="0,5" 
+                             Text=""/>
+                    
+                    <TextBlock Text="Leave empty for automatic detection" 
+                               FontSize="11" 
+                               Foreground="#888" 
+                               Margin="0,2"/>
+                </StackPanel>
+            </GroupBox>
+            
+            <!-- API Token -->
+            <GroupBox Header="Security" 
+                      Margin="0,0,0,15" 
+                      Foreground="#aaa">
+                <StackPanel Margin="10">
+                    <Label Content="API Token (optional):"/>
+                    <TextBox x:Name="ApiTokenTextBox" 
+                             Margin="0,5" 
+                             Text=""/>
+                    <TextBlock Text="Leave empty to disable authentication" 
+                               FontSize="11" 
+                               Foreground="#888" 
+                               Margin="0,2"/>
+                </StackPanel>
+            </GroupBox>
+            
+            <!-- Test Section -->
+            <GroupBox Header="Test" 
+                      Margin="0,0,0,15" 
+                      Foreground="#aaa">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Test the document display with signature placeholder:" 
+                               FontSize="12" 
+                               Margin="0,0,0,10"/>
+                    <Button Content="Show Test Document" 
+                            Click="OnShowTestDocumentClick"
+                            Width="200"
+                            HorizontalAlignment="Left"/>
+                    <TextBlock Text="This will display a sample document with a signature area" 
+                               FontSize="11" 
+                               Foreground="#888" 
+                               Margin="0,5"/>
+                </StackPanel>
+            </GroupBox>
+            
+            <!-- Status -->
+            <GroupBox Header="Status" 
+                      Margin="0,0,0,15" 
+                      Foreground="#aaa">
+                <StackPanel Margin="10">
+                    <TextBlock x:Name="StatusText" 
+                               Text="API Server: Running on http://localhost:12345" 
+                               FontSize="12"/>
+                    <TextBlock x:Name="MonitorStatusText" 
+                               Text="Monitor: Not connected" 
+                               FontSize="12"
+                               Margin="0,5"/>
+                </StackPanel>
+            </GroupBox>
+            
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right" 
+                        Margin="0,10,0,0">
+                <Button Content="Save" 
+                        Click="OnSaveClick"
+                        Background="#10b981"/>
+                <Button Content="Apply" 
+                        Click="OnApplyClick"/>
+                <Button Content="Cancel" 
+                        Click="OnCancelClick"
+                        Background="#6b7280"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

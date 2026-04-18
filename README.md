@@ -2,6 +2,19 @@
 
 ## Signature Bridge (.NET 8 WPF)
 
+Signature Bridge is a Windows application that displays documents on a secondary monitor for signature workflows. It provides a local HTTP API for remote control and includes a graphical configuration interface.
+
+### Features
+
+- **GUI Configuration**: Built-in configuration window for easy setup
+- **Loading Image**: Customize the logo/loading image displayed in idle state
+- **Document Display**: Show documents with signature placeholders on secondary monitor
+- **Test Mode**: Built-in test document with signature area for validation
+- **Monitor Selection**: Automatic or manual monitor selection
+- **API Authentication**: Optional token-based authentication
+- **Tray Icon**: System tray integration with quick actions
+- **Self-Contained**: Single EXE with no runtime dependencies
+
 ### Quick Install (One-Click)
 
 Run this single command in PowerShell to clone, build, and install:
@@ -55,6 +68,31 @@ git clone https://github.com/dawideq5/myperformance-driver.git; cd myperformance
   - `PreferredResolution` (optional fallback like `1024x600`)
   - `ApiToken` (optional; if set, include `token` query or `X-SignatureBridge-Token` header)
 - Installer script: `installer/SignatureBridge.iss`
+
+### Configuration GUI
+
+Signature Bridge includes a built-in configuration window accessible via:
+
+1. **Tray Icon**: Right-click the system tray icon and select "Configuration"
+2. **On-Screen Button**: Click the ⚙ button in the top-right corner of the window (when visible)
+
+The configuration window allows you to:
+
+- **Loading Image**: Set a custom logo or loading image (URL or local file)
+- **Monitor Selection**: Choose which monitor to use for display
+- **Resolution**: Set preferred resolution (optional)
+- **API Token**: Configure authentication token for API access
+- **Test Display**: Preview a test document with signature placeholder
+- **Status**: View current connection status and monitor information
+
+### Usage
+
+1. Install and run Signature Bridge
+2. The application will automatically detect and connect to a secondary monitor
+3. Access configuration via tray icon or on-screen button
+4. Set your preferred loading image and monitor settings
+5. Use the "Test" button to verify document display
+6. Control the application via HTTP API from your web application
 
 ## Building
 
