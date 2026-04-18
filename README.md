@@ -2,7 +2,7 @@
 
 ## Signature Bridge (.NET 8 WPF)
 
-- Project: `/home/runner/work/myperformance-driver/myperformance-driver/SignatureBridge`
+- Project: `SignatureBridge`
 - Local API:
   - `GET http://localhost:12345/show?url=https://...`
   - `GET http://localhost:12345/idle`
@@ -11,4 +11,5 @@
   - `LogoUri` (image displayed in idle state)
   - `PreferredScreenDeviceName` (optional monitor device name)
   - `PreferredResolution` (optional fallback like `1024x600`)
-- Installer script: `/home/runner/work/myperformance-driver/myperformance-driver/installer/SignatureBridge.iss`
+  - `ApiToken` (optional; if set, include `token` query or `X-SignatureBridge-Token` header)
+- Installer script: `installer/SignatureBridge.iss`

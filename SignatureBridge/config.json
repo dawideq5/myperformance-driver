@@ -1,5 +1,6 @@
 {
   "LogoUri": "https://dummyimage.com/1920x1080/0e0e0e/ffffff.png&text=Signature+Bridge",
   "PreferredScreenDeviceName": "",
-  "PreferredResolution": ""
+  "PreferredResolution": "",
+  "ApiToken": ""
 }

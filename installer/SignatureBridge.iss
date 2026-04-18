@@ -30,6 +30,47 @@ Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "{#AppName}"; ValueData: """{app}\{#AppExeName}"""; Flags: uninsdeletevalue
 
 [Code]
+function CompareDotNetVersion(const Left, Right: string): Integer;
+var
+  LParts, RParts: TArrayOfString;
+  I, LValue, RValue, Count: Integer;
+begin
+  LParts := SplitString(Left, '.');
+  RParts := SplitString(Right, '.');
+
+  if GetArrayLength(LParts) > GetArrayLength(RParts) then
+    Count := GetArrayLength(LParts)
+  else
+    Count := GetArrayLength(RParts);
+
+  for I := 0 to Count - 1 do
+  begin
+    if I < GetArrayLength(LParts) then
+      LValue := StrToIntDef(LParts[I], 0)
+    else
+      LValue := 0;
+
+    if I < GetArrayLength(RParts) then
+      RValue := StrToIntDef(RParts[I], 0)
+    else
+      RValue := 0;
+
+    if LValue > RValue then
+    begin
+      Result := 1;
+      exit;
+    end;
+
+    if LValue < RValue then
+    begin
+      Result := -1;
+      exit;
+    end;
+  end;
+
+  Result := 0;
+end;
+
 function IsDotNet8Installed: Boolean;
 var
   Version: string;
@@ -37,7 +78,7 @@ begin
   Result := False;
   if RegQueryStringValue(HKLM64, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost', 'Version', Version) then
   begin
-    Result := CompareVersion(Version, '8.0.0') >= 0;
+    Result := CompareDotNetVersion(Version, '8.0.0') >= 0;
   end;
 end;
 

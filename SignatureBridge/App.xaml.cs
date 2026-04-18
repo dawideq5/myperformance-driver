@@ -1,8 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-
-namespace SignatureBridge;
+﻿namespace SignatureBridge;
 
 /// <summary>
 /// Interaction logic for App.xaml

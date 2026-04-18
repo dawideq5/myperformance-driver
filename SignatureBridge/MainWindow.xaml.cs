@@ -67,8 +67,9 @@ public partial class MainWindow : Window
             {
                 break;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"HTTP listener loop error: {ex}");
                 if (context is not null)
                 {
                     await WriteResponseAsync(context.Response, 500, "Internal Server Error", "text/plain");
@@ -81,13 +82,26 @@ public partial class MainWindow : Window
 
     private async Task ProcessRequestAsync(HttpListenerContext context)
     {
+        if (!context.Request.IsLocal)
+        {
+            await WriteResponseAsync(context.Response, 403, "Forbidden", "text/plain");
+            return;
+        }
+
+        if (!IsTokenAuthorized(context.Request))
+        {
+            await WriteResponseAsync(context.Response, 401, "Unauthorized", "text/plain");
+            return;
+        }
+
         var route = context.Request.Url?.AbsolutePath?.Trim('/').ToLowerInvariant();
         switch (route)
         {
             case "show":
             {
                 var url = context.Request.QueryString["url"];
-                if (!Uri.TryCreate(url, UriKind.Absolute, out var targetUri))
+                if (!Uri.TryCreate(url, UriKind.Absolute, out var targetUri) ||
+                    (targetUri.Scheme != Uri.UriSchemeHttp && targetUri.Scheme != Uri.UriSchemeHttps))
                 {
                     await WriteResponseAsync(context.Response, 400, "Missing or invalid 'url' query parameter.", "text/plain");
                     return;
@@ -183,10 +197,27 @@ public partial class MainWindow : Window
             bitmap.EndInit();
             LogoImage.Source = bitmap;
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"Failed to load logo from '{_config.LogoUri}': {ex.Message}");
             LogoImage.Source = null;
         }
+    }
+
+    private bool IsTokenAuthorized(HttpListenerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(_config.ApiToken))
+        {
+            return true;
+        }
+
+        var providedToken = request.QueryString["token"];
+        if (string.IsNullOrWhiteSpace(providedToken))
+        {
+            providedToken = request.Headers["X-SignatureBridge-Token"];
+        }
+
+        return string.Equals(_config.ApiToken, providedToken, StringComparison.Ordinal);
     }
 
     private void ApplyDisplayConfiguration()
@@ -330,6 +361,7 @@ internal sealed class BridgeConfig
     public string LogoUri { get; init; } = "https://dummyimage.com/1920x1080/0e0e0e/ffffff.png&text=Signature+Bridge";
     public string? PreferredScreenDeviceName { get; init; }
     public string? PreferredResolution { get; init; }
+    public string? ApiToken { get; init; }
 
     public static BridgeConfig Load(string filePath)
     {
